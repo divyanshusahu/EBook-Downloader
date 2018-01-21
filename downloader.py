@@ -70,14 +70,15 @@ def downloadBook(bookID) :
 	download_url = soup2.find_all("a")[0]['href']
 	download_url = DOWNLOAD_URL + download_url
 
-	r3 = requests.get(download_url)
+	r3 = requests.get(download_url, stream=True)
 	with open(bookname,"wb") as f :
+		print "Downloading %s" % bookname
 		f.write(r3.content)
 
 def main() :	
 	parser = optparse.OptionParser()
 	parser.add_option('-s', help="Search for ebook by name", dest="bname")
-	parser.add_option('-d', help="download book by id", dest="bdwl")
+	parser.add_option('-d', help="Download book by id", dest="bdwl")
 
 	(options, args) = parser.parse_args()
 
