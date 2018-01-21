@@ -43,7 +43,7 @@ def searchBook(name) :
 	# Display of each book
 	for item in available_books_details :
 		print ""
-		for r in range(8) :
+		for r in range(9) :
 			print headings[r] + " => " + item[r]
 
 def downloadBook(bookID) :
