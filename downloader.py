@@ -4,8 +4,11 @@ import requests
 from bs4 import BeautifulSoup
 import optparse
 import sys
+import os
 
 ROOT_URL = 'http://gen.lib.rus.ec/'
+DOWNLOAD_ROOT_URL = 'https://libgen.pw/item/detail/id/'
+DOWNLOAD_URL = 'https://libgen.pw'
 
 def searchBook(name) :
 	name =name.replace(' ','+')
@@ -22,6 +25,7 @@ def searchBook(name) :
 	#print headings
 
 	no_of_available_books = len(book_lists.find_all("tr"))
+	print "\n" + str(no_of_available_books - 1) + " Books found."
 	available_books = []
 
 	for i in range(1,no_of_available_books) :
@@ -42,6 +46,34 @@ def searchBook(name) :
 		for r in range(8) :
 			print headings[r] + " => " + item[r]
 
+def downloadBook(bookID) :
+	download_url = DOWNLOAD_ROOT_URL + str(bookID) + "?id=" + str(bookID)
+	r = requests.get(download_url)
+	
+	if r.status_code == 404 :
+		print "Book not found"
+		os._exit(0)
+	
+	soup = BeautifulSoup(r.text, "lxml")
+	bookClass = soup.find_all("div",{'class','book'})
+	durl = ''
+	bookname = ''
+	for b1 in bookClass :
+		durl = b1.find_all("a")[0]['href']
+	durl = DOWNLOAD_URL + durl
+
+	for b2 in bookClass :
+		bookname = b2.find_all("div", {'class':'book-info__title'})[0].text
+
+	r2 = requests.get(durl)
+	soup2 = BeautifulSoup(r2.text, "lxml")
+	download_url = soup2.find_all("a")[0]['href']
+	download_url = DOWNLOAD_URL + download_url
+
+	r3 = requests.get(download_url)
+	with open(bookname,"wb") as f :
+		f.write(r3.content)
+
 def main() :	
 	parser = optparse.OptionParser()
 	parser.add_option('-s', help="Search for ebook by name", dest="bname")
@@ -50,13 +82,19 @@ def main() :
 	(options, args) = parser.parse_args()
 
 	if len(sys.argv) == 1 :
-		print parser.print_help()
-		exit(0)
+		print str(parser.print_help())[:-4]
+		os._exit(0)
 
 	if sys.argv[1] == '-s' :
 		bookName = options.bname
+		if len(bookName) <= 3 :
+			print "Book name must be greater then 3 character string"
+			os._exit(0)
 		searchBook(bookName)
 
+	if sys.argv[1] == '-d' :
+		bookID = options.bdwl
+		downloadBook(bookID)
 
 if __name__ == '__main__':
 	main()
