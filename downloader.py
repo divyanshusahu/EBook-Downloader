@@ -1,4 +1,4 @@
-#!/usr/bin/python2.7
+#!/usr/bin/python2
 
 import requests
 from bs4 import BeautifulSoup
@@ -31,6 +31,7 @@ def searchBook(name) :
 	for i in range(1,no_of_available_books) :
 		available_books.append(book_lists.find_all("tr")[i])
 	# available_books contains list of available books with <tr>
+	#print available_books[0]
 
 	available_books_details = []
 	for b in available_books :
@@ -45,6 +46,7 @@ def searchBook(name) :
 		print ""
 		for r in range(9) :
 			print headings[r] + " => " + item[r]
+
 
 def downloadBook(bookID) :
 	download_url = DOWNLOAD_ROOT_URL + str(bookID) + "?id=" + str(bookID)
@@ -85,6 +87,9 @@ def main() :
 	if len(sys.argv) == 1 :
 		print str(parser.print_help())[:-4]
 		os._exit(0)
+
+	if sys.argv[1] == '-h' :
+		print str(parser.print_help())
 
 	if sys.argv[1] == '-s' :
 		bookName = options.bname
