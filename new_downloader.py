@@ -112,6 +112,28 @@ class DownloadBook :
 				f.write(r22.content)
 			print 'Download Completed.'
 
+		elif mirror == 3 :
+
+			DOWNLOAD_URL = 'https://libgen.pw'
+
+			d_url3 = binfo[str(mirror)]
+			try :
+				r3 = requests.get(d_url3)
+			except :
+				print 'Mirror 3 down, Try different mirror.'
+			s3 = BeautifulSoup(r3.text, 'lxml')
+			d33 = DOWNLOAD_URL + s3.find_all('a')[-1]['href']
+
+			r33 = requests.get(d33)
+			s33 = BeautifulSoup(r33.text, 'lxml')
+			d3_url = DOWNLOAD_URL + s33.find_all('a')[1]['href']
+
+			r333 = requests.get(d3_url, stream=True)
+			with open(binfo['bookname'], 'wb') as f :
+				print 'Download in progress .....'
+				f.write(r333.content)
+			print 'Download Completed.'
+
 def main() :
 
 	parser = optparse.OptionParser()
