@@ -24,7 +24,10 @@ class SearchBook :
 
 		name = name.replace(' ','+')
 		url = self.ROOT_URL + 'search.php?req=' + str(name) + '&lg_topic=libgen&open=0&view=simple&res=25&phrase=0&column=def'
-		r = requests.get(url)
+		try :
+			r = requests.get(url)
+		except :
+			print 'gen.lib.rus.ec is unavailable at the moment.'
 		soup = BeautifulSoup(r.text, "lxml")
 		book_lists = soup.find_all("table")[2]
 		# there are total 4 tables inside the page, and the third table is storing the list of book
@@ -79,8 +82,11 @@ class DownloadBook :
 
 		if mirror == 1 :
 
-			d_url = binfo[str(mirror)]
-			r1 = requests.get(d_url)
+			d_url1 = binfo[str(mirror)]
+			try :
+				r1 = requests.get(d_url1)
+			except :
+				print 'Mirror 1 Down, Try different mirror'
 			s1 = BeautifulSoup(r1.text, 'lxml')
 			d1_url = s1.find_all('a')[0]['href']
 
@@ -88,6 +94,23 @@ class DownloadBook :
 			with open(binfo['bookname'],'wb') as f :
 				print 'Download in progress .....'
 				f.write(r11.content)
+			print 'Download Completed.'
+
+		elif mirror == 2 :
+
+			d_url2 = binfo[str(mirror)]
+			try :
+				r2 = requests.get(d_url2)
+			except :
+				print 'Mirror 2 down, Try different mirror.'
+			s2 = BeautifulSoup(r2.text,'lxml')
+			d2_url = s2.find_all('a')[1]['href']
+
+			r22 = requests.get(d2_url, stream=True)
+			with open(binfo['bookname'], 'wb') as f :
+				print 'Download in progress .....'
+				f.write(r22.content)
+			print 'Download Completed.'
 
 def main() :
 
