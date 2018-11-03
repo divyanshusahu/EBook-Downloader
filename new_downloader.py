@@ -35,7 +35,7 @@ class SearchBook :
 		#print headings
 
 		no_of_available_books = len(book_lists.find_all("tr"))
-		print "\n" + str(no_of_available_books - 1) + " Books found."
+		print "\n" + str(no_of_available_books - 1) + " Books listed."
 
 		for i in range(1,no_of_available_books) :
 			self.available_books.append(book_lists.find_all("tr")[i])
@@ -69,11 +69,31 @@ class SearchBook :
 			for r in range(9) :
 				print headings[r] + " => " + item[r]
 
+class DownloadBook :
+
+	def __init__(self, binfo, mirror) :
+
+		self.download(binfo, mirror)
+
+	def download(self, binfo, mirror) :
+
+		if mirror == 1 :
+
+			d_url = binfo[str(mirror)]
+			r1 = requests.get(d_url)
+			s1 = BeautifulSoup(r1.text, 'lxml')
+			d1_url = s1.find_all('a')[0]['href']
+
+			r11 = requests.get(d1_url, stream=True)
+			with open(binfo['bookname'],'wb') as f :
+				print 'Download in progress .....'
+				f.write(r11.content)
+
 def main() :
 
 	parser = optparse.OptionParser()
 	parser.add_option('-s', help="Search for ebook by name", dest="bname")
-	parser.add_option('-d', help="Download book by id", dest="bdwl")
+	#parser.add_option('-d', help="Download book by id", dest="bdwl")
 
 	(options, args) = parser.parse_args()
 
@@ -88,6 +108,76 @@ def main() :
 	if sys.argv[1] == '-s' : 
 		bookName = options.bname
 		sb_obj = SearchBook(bookName)
+		#print sb_obj.download_links
+		#print sb_obj.available_books[0].find_all('td')[2].text
+		#print sb_obj.available_books[0].find_all('td')[1].text
+		#print sb_obj.available_books[0].find_all('td')[0].text
+
+	"""if sys.argv[1] == '-d' :
+		
+		bookId = options.bdwl
+		cur_d_info = {}
+		
+		for j in sb_obj.download_links :
+			if j['book_id'] == bookId :
+				cur_d_info = j
+				break
+
+		if cur_d_info == {} :
+			print 'Recommanded, First search for the book or direct use mirror 3'
+
+		d_mirror = raw_input('Select the download Mirror(1-5) : ')
+
+		try :
+			d_mirror = int(d_mirror)
+		except :
+			print 'Mirror should be integer'
+			os._exit(0)
+
+		d_obj = DownloadBook(cur_d_info, d_mirror)"""
+
+	d_bookId = raw_input('\nEnter Book Id to download : ')
+
+	try :
+		d_bookId = int(d_bookId)
+	except :
+		print 'BookId must be integer'
+		os._exit(0)
+
+	cur_d_info = {}
+
+	for j in sb_obj.download_links :
+		if j['book_id'] == str(d_bookId) :
+			cur_d_info = j
+			break
+
+	if cur_d_info == {} :
+		print 'Mentioned BookId is not listed in the search'
+		os._exit(0)
+
+	bookname = ''
+	author = ''
+
+	for k in sb_obj.available_books :
+		if k.find_all('td')[0].text == str(d_bookId) :
+			bookname = k.find_all('td')[2].text
+			author = k.find_all('td')[1].text
+			break
+
+	print '%s by %s is selected.' % (bookname, author)
+
+	cur_d_info['bookname'] = bookname
+	cur_d_info['author'] = author
+
+	d_mirror = raw_input('Select the download Mirror(1-5) : ')
+
+	try :
+		d_mirror = int(d_mirror)
+	except :
+		print 'Mirror should be integer'
+		os._exit(0)
+
+	d_obj = DownloadBook(cur_d_info, d_mirror)
 
 if __name__ == '__main__':
 
