@@ -87,6 +87,8 @@ class DownloadBook :
 				r1 = requests.get(d_url1)
 			except :
 				print 'Mirror 1 Down, Try different mirror'
+				os._exit(0)
+			
 			s1 = BeautifulSoup(r1.text, 'lxml')
 			d1_url = s1.find_all('a')[0]['href']
 
@@ -103,6 +105,8 @@ class DownloadBook :
 				r2 = requests.get(d_url2)
 			except :
 				print 'Mirror 2 down, Try different mirror.'
+				os._exit(0)
+			
 			s2 = BeautifulSoup(r2.text,'lxml')
 			d2_url = s2.find_all('a')[1]['href']
 
@@ -121,6 +125,8 @@ class DownloadBook :
 				r3 = requests.get(d_url3)
 			except :
 				print 'Mirror 3 down, Try different mirror.'
+				os._exit(0)
+			
 			s3 = BeautifulSoup(r3.text, 'lxml')
 			d33 = DOWNLOAD_URL + s3.find_all('a')[-1]['href']
 
