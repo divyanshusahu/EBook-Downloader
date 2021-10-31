@@ -1,10 +1,26 @@
 #!/usr/bin/python2
+import logging
+import time
 
 import requests
 from bs4 import BeautifulSoup
 import optparse
 import sys
 import os
+
+
+# Log management:
+file_time = time.strftime("%Y_%m_%d___%H_%M_%S", time.localtime())
+LOGFILE_NAME = "E_BOOK_DOWNLOADER.log".format(file_time)
+handler_logging = logging.StreamHandler(sys.stdout)
+
+logging.getLogger().setLevel(logging.INFO)
+logging.basicConfig(
+    filename=LOGFILE_NAME,
+    level=logging.DEBUG
+)
+logging.getLogger().addHandler(handler_logging)
+
 
 class SearchBook :
 
@@ -19,6 +35,7 @@ class SearchBook :
 	def sb(self, name) :
 
 		if len(name) < 3 :
+			logging.info('Book Name must contain minimum three characters')
 			print 'Book Name must contain minimum three characters'
 			os._exit(0)
 
@@ -27,6 +44,7 @@ class SearchBook :
 		try :
 			r = requests.get(url)
 		except :
+			logging.error('gen.lib.rus.ec is unavailable at the moment.')
 			print 'gen.lib.rus.ec is unavailable at the moment.'
 		soup = BeautifulSoup(r.text, "lxml")
 		book_lists = soup.find_all("table")[2]
@@ -72,6 +90,7 @@ class SearchBook :
 			for r in range(9) :
 				print headings[r] + " => " + item[r]
 
+
 class DownloadBook :
 
 	def __init__(self, binfo, mirror) :
@@ -86,6 +105,7 @@ class DownloadBook :
 			try :
 				r1 = requests.get(d_url1)
 			except :
+				logging.info('Mirror 1 Down, Try different mirror')
 				print 'Mirror 1 Down, Try different mirror'
 				os._exit(0)
 			
@@ -94,8 +114,10 @@ class DownloadBook :
 
 			r11 = requests.get(d1_url, stream=True)
 			with open(binfo['bookname'],'wb') as f :
+				logging.info('Download in progress .....')
 				print 'Download in progress .....'
 				f.write(r11.content)
+			logging.info('Download Completed.')
 			print 'Download Completed.'
 
 		elif mirror == 2 :
@@ -104,6 +126,7 @@ class DownloadBook :
 			try :
 				r2 = requests.get(d_url2)
 			except :
+				logging.error('Mirror 2 down, Try different mirror.')
 				print 'Mirror 2 down, Try different mirror.'
 				os._exit(0)
 			
@@ -112,8 +135,11 @@ class DownloadBook :
 
 			r22 = requests.get(d2_url, stream=True)
 			with open(binfo['bookname'], 'wb') as f :
+				logging.info('Download in progress .....')
 				print 'Download in progress .....'
 				f.write(r22.content)
+
+			logging.info('Download Completed.')
 			print 'Download Completed.'
 
 		elif mirror == 3 :
@@ -124,6 +150,7 @@ class DownloadBook :
 			try :
 				r3 = requests.get(d_url3)
 			except :
+				logging.error('Mirror 3 down, Try different mirror.')
 				print 'Mirror 3 down, Try different mirror.'
 				os._exit(0)
 			
@@ -136,11 +163,15 @@ class DownloadBook :
 
 			r333 = requests.get(d3_url, stream=True)
 			with open(binfo['bookname'], 'wb') as f :
+				logging.info('Download in progress .....')
 				print 'Download in progress .....'
 				f.write(r333.content)
+
+			logging.info('Download Completed.')
 			print 'Download Completed.'
 
 		else :
+			logging.error('Mirror in between 1-3.')
 			print 'Mirror in between 1-3.'
 			os._exit(0)
 
@@ -173,6 +204,7 @@ def main() :
 	try :
 		d_bookId = int(d_bookId)
 	except :
+		logging.error('BookId must be integer')
 		print 'BookId must be integer'
 		os._exit(0)
 
@@ -184,6 +216,7 @@ def main() :
 			break
 
 	if cur_d_info == {} :
+		logging.info('Mentioned BookId is not listed in the search')
 		print 'Mentioned BookId is not listed in the search'
 		os._exit(0)
 
@@ -206,11 +239,13 @@ def main() :
 	try :
 		d_mirror = int(d_mirror)
 	except :
+		logging.error("Mirror should be integer")
 		print 'Mirror should be integer'
 		os._exit(0)
 
 	d_obj = DownloadBook(cur_d_info, d_mirror)
 
 if __name__ == '__main__':
-
+	logging.info("script started")
 	main()
+	logging.info("script ended")
