@@ -15,3 +15,7 @@
 
 #### log file is generated, whenever user run the script
 python downloader.py
+
+
+#### DockerFile to dockerise the downloader script.
+docker run -it --rm --name downloader -v "$PWD":/usr/src/app -w /usr/src/app python:2 python downloader.py
