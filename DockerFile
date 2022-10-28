@@ -1,0 +1,18 @@
+# Python 2.7 base image for docker
+FROM python:2.7
+
+# working directory for the script
+WORKDIR /usr/src/app
+
+# requirements.txt to install pip dependencies
+COPY requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+# running script command
+CMD [ "python", "./downloader.py" ]
+
+
+
+# docker run -it --rm --name downloader -v "$PWD":/usr/src/app -w /usr/src/app python:2 python downloader.py

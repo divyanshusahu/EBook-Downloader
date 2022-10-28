@@ -112,6 +112,7 @@ celerybeat.pid
 .venv
 env/
 venv/
+virtualenv/
 ENV/
 env.bak/
 venv.bak/
@@ -141,3 +142,10 @@ dmypy.json
 cython_debug/
 
 .idea
+
+.pyc
+composer.lock
+debug.log
+
+# Docker settings
+.dockerignore
